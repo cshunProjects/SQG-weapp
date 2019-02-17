@@ -1,6 +1,6 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import Index from './pages/index'
-
+import Fly from 'flyio/dist/npm/wx'
 import './app.scss'
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -8,7 +8,6 @@ import './app.scss'
 // if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
 //   require('nerv-devtools')
 // }
-
 class App extends Component {
 
   /**
@@ -20,8 +19,9 @@ class App extends Component {
    */
   config: Config = {
     pages: [
-      'pages/test/index',
       'pages/index/index',
+      'pages/test/index',
+      
       
       
     ],
@@ -32,13 +32,15 @@ class App extends Component {
       navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'black',
       
+    },
+    permission: {
+      "scope.userLocation": {
+        "desc": "你的位置信息将用于小程序位置接口的效果展示"
+      }
     }
   }
 
   componentDidMount () {
-    wx.cloud.init({
-      traceUser: true
-    })
   }
 
   componentDidShow () {

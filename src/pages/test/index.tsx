@@ -1,8 +1,9 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Canvas, Image, Text, ScrollView } from '@tarojs/components'
-import { AtButton } from 'taro-ui'
+import { View, Canvas, Image, Button} from '@tarojs/components'
+
 import mapMark from '../../static/mapMark.png'
 import './index.scss'
+import Fly from 'flyio/dist/npm/wx'
 export default class Index extends Component {
 
   /**
@@ -20,36 +21,40 @@ export default class Index extends Component {
     criticalRssi:-90,//更新信号强度
     changeImage:4,//更换潮井核心景区的景区序号
     inChaoJing:1,//是否在潮井核心景区（是否切换图片） 0在 
-    interval:3,  //更新间隔（s）
+    interval:5,  //更新间隔（s）
     currentLocation:1,//现在所在的景点位置
     width:337,//手机屏幕宽度
     canvasLeft:0,//画布向左移动距离
     canvasHeight:640,//画布高度
     canvasWidth:1801,//画布长度  主景区
     chaoJingWidth:870.4,
-    currentMac:"65535:1",//现在的mac地址
     touch: {
       startLocationX:0,
       startLocationY:0,
     }
   }
+  const fly=new Fly;
   componentWillMount() {
+    
     var that = this;
     Taro.getSystemInfo({//获取手机信息，得到画布的高度和宽度
       success: function(res) {
         console.log(res)
-        var height = res.windowHeight * 0.9
-        var width = res.windowHeight*2.81
-        var chaoWidth = res.windowHeight * 1.36
-        console.log(height,width)
+        var height = res.windowHeight * 0.85
+        var width = height*2.5337837838
         that.setState({
           ...that.state,
           width:res.windowWidth,
           canvasHeight:height,
           canvasWidth:width,
-          chaoJingWidth: chaoWidth,
         })
       }
+    });
+    this.fly.get("http://39.98.84.18/api/attraction/").then(d => {
+      this.coordinate.pop()
+      this.coordinate.push.apply(this.coordinate,d["data"])
+      console.log(this.coordinate)
+      console.log(that.coordinate[2].area["coordinates"])
     });
    }
   componentDidMount() { }
@@ -65,118 +70,118 @@ export default class Index extends Component {
       "mapMarkX":0.837,//从左向右的坐标比例
       "mapMarkY":0.495,
     },
-    {
-      "name":"湿地公园",
-      "location":2,
-      "canvasLeft":1.3,
-      "mapMarkX":0.783,
-      "mapMarkY":0.45,
-    },
-    {
-      "name":"葫芦湖",
-      "location":3,
-      "canvasLeft":1.5,
-      "mapMarkX":0.745,
-      "mapMarkY":0.42,
-    },
-    {
-      "name":"百顺桥",
-      "location":4,
-      "canvasLeft":3.8,
-      "mapMarkX":0.246,
-      "mapMarkY":0.3,
-    },
-    {
-      "name":"潮井顺文化广场",
-      "location":5,
-      "canvasLeft":4.3,
-      "mapMarkX":0.095,
-      "mapMarkY":0.48,
-    },
-    {
-      "name":"神泉潮井",
-      "location":6,
-      "canvasLeft":4.3,
-      "mapMarkX":0.063,
-      "mapMarkY":0.438,
-    },
-    {
-      "name":"神泉驿站及神泉瀑布",
-      "location":7,
-      "canvasLeft":1.8,
-      "mapMarkX":0.71,
-      "mapMarkY":0.264,
-    },
-    {
-      "name":"三七农场和桃花园",
-      "location":8,
-      "canvasLeft":2,
-      "mapMarkX":0.652,
-      "mapMarkY":0.09,
-    },
-    {
-      "name":"画家村入口及画家村",
-      "location":9,
-      "canvasLeft":2.25,
-      "mapMarkX":0.623,
-      "mapMarkY":0.145,
-    },
-    {
-      "name":"画家村服务中心",
-      "location":10,
-      "canvasLeft":1.9,
-      "mapMarkX":0.659,
-      "mapMarkY":0.178,
-    },
-    {
-      "name":"滑草场",
-      "location":11,
-      "canvasLeft":2.45,
-      "mapMarkX":0.571,
-      "mapMarkY":0.139,
-    },
-    {
-      "name":"紫薇林",
-      "location":12,
-      "canvasLeft":2.6,
-      "mapMarkX":0.5269,
-      "mapMarkY":0.218,
-    },
-    {//没有
-      "name":"狸风塘瀑布",
-      "location":13,
-      "canvasLeft":2.6,
-      "mapMarkX":0.5269,
-      "mapMarkY":0.218,
-    },
-    {//没有
-      "name":"红军桥及红军瀑布",
-      "location":14,
-      "canvasLeft":2.6,
-      "mapMarkX":0.5269,
-      "mapMarkY":0.218,
-    },
-    {
-      "name":"粉黛草观赏区",
-      "location":15,
-      "canvasLeft":3.87,
-      "mapMarkX":0.26,
-      "mapMarkY":0.36,
-    },
-    {
-      "name":"飞花驿站",
-      "location":16,
-      "canvasLeft":4,
-      "mapMarkX":0.2,
-      "mapMarkY":0.414,
-    }
+    // {
+    //   "name":"湿地公园",
+    //   "location":2,
+    //   "canvasLeft":1.3,
+    //   "mapMarkX":0.783,
+    //   "mapMarkY":0.45,
+    // },
+    // {
+    //   "name":"葫芦湖",
+    //   "location":3,
+    //   "canvasLeft":1.5,
+    //   "mapMarkX":0.745,
+    //   "mapMarkY":0.42,
+    // },
+    // {
+    //   "name":"百顺桥",
+    //   "location":4,
+    //   "canvasLeft":3.8,
+    //   "mapMarkX":0.246,
+    //   "mapMarkY":0.3,
+    // },
+    // {
+    //   "name":"潮井顺文化广场",
+    //   "location":5,
+    //   "canvasLeft":4.3,
+    //   "mapMarkX":0.095,
+    //   "mapMarkY":0.48,
+    // },
+    // {
+    //   "name":"神泉潮井",
+    //   "location":6,
+    //   "canvasLeft":4.3,
+    //   "mapMarkX":0.063,
+    //   "mapMarkY":0.438,
+    // },
+    // {
+    //   "name":"神泉驿站及神泉瀑布",
+    //   "location":7,
+    //   "canvasLeft":1.8,
+    //   "mapMarkX":0.71,
+    //   "mapMarkY":0.264,
+    // },
+    // {
+    //   "name":"三七农场和桃花园",
+    //   "location":8,
+    //   "canvasLeft":2,
+    //   "mapMarkX":0.652,
+    //   "mapMarkY":0.09,
+    // },
+    // {
+    //   "name":"画家村入口及画家村",
+    //   "location":9,
+    //   "canvasLeft":2.25,
+    //   "mapMarkX":0.623,
+    //   "mapMarkY":0.145,
+    // },
+    // {
+    //   "name":"画家村服务中心",
+    //   "location":10,
+    //   "canvasLeft":1.9,
+    //   "mapMarkX":0.659,
+    //   "mapMarkY":0.178,
+    // },
+    // {
+    //   "name":"滑草场",
+    //   "location":11,
+    //   "canvasLeft":2.45,
+    //   "mapMarkX":0.571,
+    //   "mapMarkY":0.139,
+    // },
+    // {
+    //   "name":"紫薇林",
+    //   "location":12,
+    //   "canvasLeft":2.6,
+    //   "mapMarkX":0.5269,
+    //   "mapMarkY":0.218,
+    // },
+    // {//没有
+    //   "name":"狸风塘瀑布",
+    //   "location":13,
+    //   "canvasLeft":2.6,
+    //   "mapMarkX":0.5269,
+    //   "mapMarkY":0.218,
+    // },
+    // {//没有
+    //   "name":"红军桥及红军瀑布",
+    //   "location":14,
+    //   "canvasLeft":2.6,
+    //   "mapMarkX":0.5269,
+    //   "mapMarkY":0.218,
+    // },
+    // {
+    //   "name":"粉黛草观赏区",
+    //   "location":15,
+    //   "canvasLeft":3.87,
+    //   "mapMarkX":0.26,
+    //   "mapMarkY":0.36,
+    // },
+    // {
+    //   "name":"飞花驿站",
+    //   "location":16,
+    //   "canvasLeft":4,
+    //   "mapMarkX":0.2,
+    //   "mapMarkY":0.414,
+    // }
 
   ]
   scenicArea = {//景区mac对应的景区序号，"65535:1"对应coordinate中的1号
-    "65535:1":16,
-    "65535:2":16,
-    "65535:3":16,
-    "65535:4":16,
+    "65535:1":1,
+    "65535:2":1,
+    "65535:3":2,
+    "65535:4":2,
   }
   componentWillUnmount() {
 
@@ -194,6 +199,67 @@ export default class Index extends Component {
       }
     }
   }
+  latLng2Pixel(lng, lat) {//latitude 纬度   longitude经度
+    var size = (2 << 19) * 256 / 4;
+    var x = (1 + lng / 180) * size;
+    var y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+    y = (1 - y / 180) * size;
+    return [x - 106791808, y - 57042816];
+  }
+  isInPolygon(checkPoint, polygonPoints) {//判断点是否在多边形内的算法
+    var counter = 0;//checkpoint监测点   polygonPoints多边形点（数组）
+    var i;
+    var xinters;
+    var p1, p2;
+    var pointCount = polygonPoints.length;
+    p1 = polygonPoints[0];
+ 
+    for (i = 1; i <= pointCount; i++) {
+        p2 = polygonPoints[i % pointCount];
+        if (
+            checkPoint[0] > Math.min(p1[0], p2[0]) &&
+            checkPoint[0] <= Math.max(p1[0], p2[0])
+        ) {
+            if (checkPoint[1] <= Math.max(p1[1], p2[1])) {
+                if (p1[0] != p2[0]) {
+                    xinters =
+                        (checkPoint[0] - p1[0]) *
+                            (p2[1] - p1[1]) /
+                            (p2[0] - p1[0]) +
+                        p1[1];
+                    if (p1[1] == p2[1] || checkPoint[1] <= xinters) {
+                        counter++;
+                    }
+                }
+            }
+        }
+        p1 = p2;
+    }
+      if (counter % 2 == 0) {
+          return false;
+      } else {
+          return true;
+      }
+  }
+  drawMapMark(num) {
+    let [x,y] = this.coordinate[num].pos["coordinates"]
+    let [m,n] = this.latLng2Pixel(x,y)
+    m = m/29844
+    n = n/11777
+    let temp1 = 70/this.state.canvasHeight 
+    let temp2 = 35/this.state.canvasWidth
+    var currentCanvasLeft = -(m-temp2) * this.state.canvasWidth + 0.5*this.state.width;
+    var mapMarkx = this.state.canvasWidth *  (m- temp2)
+    var mapMarky = this.state.canvasHeight * (n - temp1)
+    this.context.drawImage(mapMark, mapMarkx, mapMarky,70,70);
+    this.context.draw();
+    this.setState({
+    ...this.state,
+    canvasLeft:currentCanvasLeft,
+    currentLocation:this.coordinate[num].id,
+    })
+  }
+
   componentDidShow() {
     var that = this;
     var beaconsTempArray : any[] = [];
@@ -207,7 +273,6 @@ export default class Index extends Component {
     //     searchBeacon();
     //   }
     // })
-
 
     var flag = 1;
     Taro.startBeaconDiscovery(info).then(() => {//开始搜索附近的iBeacon设备
@@ -234,7 +299,7 @@ export default class Index extends Component {
               };
               bleObj.rssi = beacons[i].rssi;
               bleObj.mac = that.scenicArea[`${beacons[i].major + ":" + beacons[i].minor}`];
-              console.log(bleObj.mac);
+             // console.log(bleObj.mac);
               beaconsTempArray.push(bleObj);
             }
           }
@@ -246,30 +311,23 @@ export default class Index extends Component {
         item.rssi = item.rssi / item.num;
       })
       beaconsTempArray.sort(that.compare("rssi"));//对信号强度进行排序
-
-      if(beaconsTempArray.length && beaconsTempArray[0].rssi > that.state.criticalRssi && that.state.currentLocation != that.coordinate[beaconsTempArray[0].mac].location)
+      if(beaconsTempArray.length && beaconsTempArray[0].rssi > that.state.criticalRssi && that.state.currentLocation != that.coordinate[beaconsTempArray[0].mac].id)
       {
-        //console.log(that.coordinate[that.scenicArea[`${beaconsTempArray[0].mac}`]].mapMarkX)
-        var currentCanvasLeft = that.state.canvasWidth - that.coordinate[beaconsTempArray[0].mac].canvasLeft * that.state.width;
-        currentCanvasLeft = -currentCanvasLeft;
-        var ChaoJing = !(that.coordinate[beaconsTempArray[0].mac].location === 5 || that.coordinate[beaconsTempArray[0].mac].location === 4 || that.coordinate[beaconsTempArray[0].mac].location === 6)
-        console.log(ChaoJing)
-        console.log(currentCanvasLeft);
-        //console.log(currentCanvasLeft);
-        //console.log("changeLocation")
-        var mapMarkx = that.state.canvasWidth * that.coordinate[beaconsTempArray[0].mac].mapMarkX
-        var mapMarky = that.state.canvasHeight * that.coordinate[beaconsTempArray[0].mac].mapMarkY
-        that.context.drawImage(mapMark, mapMarkx, mapMarky,70,70);
-        that.context.draw();
-        that.setState({
-        ...that.state,
-        inChaoJing: ChaoJing,
-        canvasLeft:currentCanvasLeft,
-        currentLocation:that.coordinate[beaconsTempArray[0].mac].location,
-        currentMac:beaconsTempArray[0].mac,
-        currentRssi:beaconsTempArray[0].Rssi
-        })
+        console.log(beaconsTempArray[0].mac)
+        that.drawMapMark(beaconsTempArray[0].mac)
       }
+      if(!beaconsTempArray.length || beaconsTempArray[0].rssi < that.state.criticalRssi) {//处理ibeacon信号弱或者收不到ibeacon信号时情况
+        // Taro.getLocation().then( d => {
+        //   console.log(11,d)
+        //   for(let i = 1; i < that.coordinate.length;i++) {
+        //     // if(that.isInPolygon([d["longitude"],d["latitude"]], that.coordinate[i].area["coordinates"])) {
+        //     //   that.drawMapMark(i)
+        //     //   break;
+        //     // }
+        //   }
+        // })
+      }
+      
       beaconsTempArray = [];
     },this.state.interval*1000)
     function stopSearchBeacom() {
@@ -283,7 +341,7 @@ export default class Index extends Component {
     this.context.fill()
   }
   componentDidHide() { }
-  touchMoveCallBack(e) {//手指移动回掉函数
+  touchMoveCallBack(e) {//手指移动回调函数
     let x = e.changedTouches[0]["x"]
     let currentTouchX = this.state.touch["startLocationX"];
     let currentX = this.state.canvasLeft;
@@ -297,8 +355,6 @@ export default class Index extends Component {
     })
   }
   touchstartCallback(e) {//开始触摸时执行的函数，将触摸起始位置保存
-    console.log(111);
-    console.log(e)
     this.setState({
       ...this.state,
       touch:{
@@ -308,7 +364,11 @@ export default class Index extends Component {
       }
     })
   }
- 
+  seeDetails() {
+    Taro.navigateTo({
+      url: `../index/index?id=${this.state.currentLocation}`
+    });
+  }
   render() {
     return (
       <View className='page' >
@@ -319,20 +379,17 @@ export default class Index extends Component {
           onTouchStart={this.touchstartCallback}
           onTouchMove={this.touchMoveCallBack}
           >
-          {this.state.inChaoJing 
-          ? <Image  src= "cloud://test-70b991.7465-test-70b991/1.jpg" style= "height:{{canvasHeight}}px;width:{{canvasWidth}}px;"></Image>
-          : <Image  src="https://7465-test-70b991-1258348028.tcb.qcloud.la/03chaojing.jpg?sign=c612f13f47f497c4550624fb614e05a0&t=1549161309" style="height:{{canvasHeight}}px;width:{{chaoJingWidth}}px;"></Image>
-          }
-        
+           <Image  src="cloud://test-70b991.7465-test-70b991/newmap.jpg" style= "height:{{canvasHeight}}px;width:{{canvasWidth}}px;"></Image>
         </Canvas> 
         <View className='introduction'>
           <View className='box1'></View>
           <View className="info">
             <View className='scenicName'>
-              name of scenic Area;
-              {this.scenicArea["65535:1"]}
+              <View>
+                {this.coordinate[this.state.currentLocation].name}
+              </View>
             </View>
-            <View className="details">查看详情</View>
+            <View className="details" onClick={this.seeDetails}>查看详情 >></View>
           </View>
         </View>
       </View>

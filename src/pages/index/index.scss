@@ -1,3 +1,46 @@
-.canvas {
-   
+.page {
+    display:flex;
+    flex-flow:column nowrap;
+    background-color:rgb(220,220,220);
+    width:100%; 
+    height:100%;    
+     .swiper {
+        position:fixed !important;
+        width:100%;
+     }
+    .box1 {
+        display:flex !important;
+          
+        width:100%;
+    }   
+    .introductionContainer{
+        background-color:rgb(220,220,220);
+        display:flex;
+        flex-flow: column wrap;
+        align-items: center;
+        .introduction { 
+            padding-top:20px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            background-color: white;
+            width:90%;
+            display:flex;
+            flex-flow: column nowrap;
+            .title { 
+                font-size:70px;
+                padding-left:40px;
+                padding-bottom: 15px;
+            }
+            .wordContentContainer {
+                display:flex;
+                justify-content: center;
+                  
+                .wordContent {
+                    padding-top:15px;
+                    width:90%;
+                }
+            }
+           
+        }
+    }
 }

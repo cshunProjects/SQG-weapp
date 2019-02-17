@@ -4,11 +4,12 @@
 	"description": "",
 	"appid": "wx4fbf3fa15a2d348c",
 	"setting": {
-		"urlCheck": true,
+		"urlCheck": false,
 		"es6": false,
 		"postcss": false,
 		"minified": false,
-		"newFeature": true
+		"newFeature": true,
+		"autoAudits": false
 	},
 	"compileType": "miniprogram",
 	"condition": {}

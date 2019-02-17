@@ -28,13 +28,26 @@
       height:85%;
    }
    .info {
+      border-top-left-radius: 35px;
+      border-top-right-radius: 35px;
       height:15%;
-      background-color: white;
+      background-color: rgb(236,236,236);
+      position:fixed;
+      width:100%;
+      bottom:0;
+      .scenicName {
+         padding-top:10px;
+         font-size: 50px;
+         justify-content: center;
+         display: flex;
+      }
+      .details {
+         font-size:35px;
+         position:fixed;
+         bottom:30px;
+         right:20px;
+      }
    }
-   .scenicName {
-      
-      bottom:0
-      
-   }
+   
  }
 
