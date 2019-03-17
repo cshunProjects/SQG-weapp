@@ -1,0 +1,33 @@
+.index {
+    position:fixed;
+    width:100%;
+    background-color: rgb(131,194,220);
+    color:white;
+    height:120px;
+    z-index:1000;
+    box-shadow: 0px 0px 300px rgb(131,194,220);
+}
+.indexIpx {
+    z-index:1000;
+    position:fixed;
+    width:100%;
+    background-color: rgb(131,194,220);
+    color:white;
+    height:175px;
+    box-shadow: 0px 0px 500px rgb(131,194,220);
+}
+.topIpx {
+    position:fixed;
+    width:100%;
+    
+    left:300px;
+    top:100px;
+}
+
+.top {
+    position:fixed;
+    width:100%;
+    margin:0 auto;
+    left:300px;
+    top:55px;
+}

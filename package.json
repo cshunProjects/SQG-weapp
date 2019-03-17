@@ -31,7 +31,7 @@
     "taro-ui": "^1.5.4"
   },
   "devDependencies": {
-    "@tarojs/plugin-babel": "^1.2.0-beta.7",
+    "@tarojs/plugin-babel": "^1.2.15",
     "@tarojs/plugin-csso": "^1.2.0-beta.7",
     "@tarojs/plugin-sass": "^1.2.0-beta.7",
     "@tarojs/plugin-uglifyjs": "^1.2.0-beta.7",

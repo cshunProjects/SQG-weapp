@@ -1,11 +1,54 @@
-import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Canvas, Image, Button} from '@tarojs/components'
-
-import mapMark from '../../static/mapMark.png'
+import Taro, { Component, Config, request } from '@tarojs/taro'
+import { View, Canvas, CoverImage ,CoverView, Swiper,SwiperItem} from '@tarojs/components'
+import mapMark from '../../static/my_loc.png'
+import map from '../../static/newmap.jpg'
 import './index.scss'
-import Fly from 'flyio/dist/npm/wx'
-export default class Index extends Component {
+import isInPolygon from '../services/api/isInPolygon'
+import HomePageTar from '../../components/HomePageTar/index'
+import shadowUp from '../../static/shadowUP.png'
+import shadowDown from '../../static/shadowDOWN.png'
+import cancel from '../../static/cancel.png'
+import down1 from '../../static/up.png'
+import down from '../../static/down.png'
+import shenquangu from '../../static/shenquangu.jpeg'
+const FPS = 60;
 
+type num = [number];
+interface Position {
+  type: string;
+  cooridates: num;
+}
+
+interface Coordinate {
+  pos: Position;
+  id: number;
+  name: string;
+  description: string;
+  audio: string;
+  area: {
+    cooridates: [num];
+    type: string;
+  };
+}
+
+function throttle(fn, gapTime = 1500): (e: any) => void {
+  let lastTime;
+  return function (e) {
+    if (!lastTime) {
+      lastTime = Date.now();
+      fn(e);
+    }
+    else {
+      if (Date.now() - lastTime >= gapTime) {
+        fn(e)
+        lastTime = Date.now();
+      };
+
+    }
+  };
+}
+
+export default class Index extends Component {
   /**
    * 指定config的类型声明为: Taro.Config
    *
@@ -14,190 +57,85 @@ export default class Index extends Component {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: '首页',    
   }
-
+  context = Taro.createCanvasContext('canvas', this.$scope);
+  coordinate: Coordinate[] = [];
+  timer: any = null
+  beginTouchX: number = 0
+  beginTouchY: number = 0
+  mapWidth: number = 0
+  mapHeight: number = 0
+  mapX: number = 0
+  mapY: number = 0
+  distance:number = 0
+  scale:number = 1
+  baseWidth:number = 0
+  baseHeight:number = 0
+  update:number = 0
+  uuidArray = {
+    uuids: ["02ff8bf0-0913-47d6-b513-c382cf326fc7"],
+  }
   state = {
-    criticalRssi:-90,//更新信号强度
-    changeImage:4,//更换潮井核心景区的景区序号
-    inChaoJing:1,//是否在潮井核心景区（是否切换图片） 0在 
-    interval:5,  //更新间隔（s）
-    currentLocation:1,//现在所在的景点位置
-    width:337,//手机屏幕宽度
-    canvasLeft:0,//画布向左移动距离
-    canvasHeight:640,//画布高度
-    canvasWidth:1801,//画布长度  主景区
-    chaoJingWidth:870.4,
+    
+    tip:true,
+    up:true,
+    isIPX:false,
+    currentLocation: -1,
+    mapViewHeight: 0,
+    mapViewWidth: 0,
+    marginTop: 0,
+    marginLeft: 0,
+    width: 337,//手机屏幕宽度
+    canvasLeft: 0,//画布向左移动距离
+    canvasHeight: 640,//画布高度
+    canvasWidth: 1801,//画布长度  主景区
     touch: {
-      startLocationX:0,
-      startLocationY:0,
+      startLocationX: 0,
+      startLocationY: 0,
     }
   }
-  const fly=new Fly;
+
+  constructor(props) {
+    super(props);
+    this.move = throttle(this.move, 1000 / FPS);
+  }
+  
+  request() {
+    Taro.request({url:"https://www.shenquangu.net:25888/api/attraction/"}).then(d => {
+      console.log(d)
+      this.load = 1;
+      this.coordinate.push.apply(this.coordinate, d["data"])
+    },res => {
+      console.log(res)
+      this.request();
+    });
+  }
   componentWillMount() {
     
-    var that = this;
-    Taro.getSystemInfo({//获取手机信息，得到画布的高度和宽度
-      success: function(res) {
-        console.log(res)
-        var height = res.windowHeight * 0.85
-        var width = height*2.5337837838
-        that.setState({
-          ...that.state,
-          width:res.windowWidth,
-          canvasHeight:height,
-          canvasWidth:width,
-        })
-      }
-    });
-    this.fly.get("http://39.98.84.18/api/attraction/").then(d => {
-      this.coordinate.pop()
-      this.coordinate.push.apply(this.coordinate,d["data"])
-      console.log(this.coordinate)
-      console.log(that.coordinate[2].area["coordinates"])
-    });
-   }
-  componentDidMount() { }
-  context = Taro.createCanvasContext('canvas', this.$scope)
-  coordinate = [//各个景点的坐标、画布位置及名称
-    {
-
-    },
-    {
-      "name":"荷花池",
-      "location":1,
-      "canvasLeft":1,//从右向左减去多少个屏幕宽度
-      "mapMarkX":0.837,//从左向右的坐标比例
-      "mapMarkY":0.495,
-    },
-    // {
-    //   "name":"湿地公园",
-    //   "location":2,
-    //   "canvasLeft":1.3,
-    //   "mapMarkX":0.783,
-    //   "mapMarkY":0.45,
-    // },
-    // {
-    //   "name":"葫芦湖",
-    //   "location":3,
-    //   "canvasLeft":1.5,
-    //   "mapMarkX":0.745,
-    //   "mapMarkY":0.42,
-    // },
-    // {
-    //   "name":"百顺桥",
-    //   "location":4,
-    //   "canvasLeft":3.8,
-    //   "mapMarkX":0.246,
-    //   "mapMarkY":0.3,
-    // },
-    // {
-    //   "name":"潮井顺文化广场",
-    //   "location":5,
-    //   "canvasLeft":4.3,
-    //   "mapMarkX":0.095,
-    //   "mapMarkY":0.48,
-    // },
-    // {
-    //   "name":"神泉潮井",
-    //   "location":6,
-    //   "canvasLeft":4.3,
-    //   "mapMarkX":0.063,
-    //   "mapMarkY":0.438,
-    // },
-    // {
-    //   "name":"神泉驿站及神泉瀑布",
-    //   "location":7,
-    //   "canvasLeft":1.8,
-    //   "mapMarkX":0.71,
-    //   "mapMarkY":0.264,
-    // },
-    // {
-    //   "name":"三七农场和桃花园",
-    //   "location":8,
-    //   "canvasLeft":2,
-    //   "mapMarkX":0.652,
-    //   "mapMarkY":0.09,
-    // },
-    // {
-    //   "name":"画家村入口及画家村",
-    //   "location":9,
-    //   "canvasLeft":2.25,
-    //   "mapMarkX":0.623,
-    //   "mapMarkY":0.145,
-    // },
-    // {
-    //   "name":"画家村服务中心",
-    //   "location":10,
-    //   "canvasLeft":1.9,
-    //   "mapMarkX":0.659,
-    //   "mapMarkY":0.178,
-    // },
-    // {
-    //   "name":"滑草场",
-    //   "location":11,
-    //   "canvasLeft":2.45,
-    //   "mapMarkX":0.571,
-    //   "mapMarkY":0.139,
-    // },
-    // {
-    //   "name":"紫薇林",
-    //   "location":12,
-    //   "canvasLeft":2.6,
-    //   "mapMarkX":0.5269,
-    //   "mapMarkY":0.218,
-    // },
-    // {//没有
-    //   "name":"狸风塘瀑布",
-    //   "location":13,
-    //   "canvasLeft":2.6,
-    //   "mapMarkX":0.5269,
-    //   "mapMarkY":0.218,
-    // },
-    // {//没有
-    //   "name":"红军桥及红军瀑布",
-    //   "location":14,
-    //   "canvasLeft":2.6,
-    //   "mapMarkX":0.5269,
-    //   "mapMarkY":0.218,
-    // },
-    // {
-    //   "name":"粉黛草观赏区",
-    //   "location":15,
-    //   "canvasLeft":3.87,
-    //   "mapMarkX":0.26,
-    //   "mapMarkY":0.36,
-    // },
-    // {
-    //   "name":"飞花驿站",
-    //   "location":16,
-    //   "canvasLeft":4,
-    //   "mapMarkX":0.2,
-    //   "mapMarkY":0.414,
-    // }
-
-  ]
-  scenicArea = {//景区mac对应的景区序号，"65535:1"对应coordinate中的1号
-    "65535:1":1,
-    "65535:2":1,
-    "65535:3":2,
-    "65535:4":2,
+    Taro.getSystemInfo().then(res => {
+      var isIpx = false;
+      if(res.model.search("iPhone X") != -1) {
+        isIpx = true;
+    }
+      let height = res.windowHeight * 0.85
+      let width = height * 2.5337837838
+      this.mapHeight = height
+      this.mapWidth = width
+      this.baseWidth = width
+      this.baseHeight = height
+      this.setState({
+        ...this.state,
+        isIPX:isIpx,
+        width: res.windowWidth,
+        canvasHeight: height,
+        canvasWidth: width,
+      })
+    })
+    this.request();
   }
+  componentDidMount() { }
   componentWillUnmount() {
 
-  }
-  compare(rssi) {//排序用函数
-    return function(obj1,obj2) {
-      let val1 = obj1[rssi];
-      let val2 = obj2[rssi];
-      if(val1 < val2) {
-        return 1;
-      } else if(val1 > val2) {
-        return -1;
-      } else {
-        return 0;
-      }
-    }
   }
   latLng2Pixel(lng, lat) {//latitude 纬度   longitude经度
     var size = (2 << 19) * 256 / 4;
@@ -206,195 +144,361 @@ export default class Index extends Component {
     y = (1 - y / 180) * size;
     return [x - 106791808, y - 57042816];
   }
-  isInPolygon(checkPoint, polygonPoints) {//判断点是否在多边形内的算法
-    var counter = 0;//checkpoint监测点   polygonPoints多边形点（数组）
-    var i;
-    var xinters;
-    var p1, p2;
-    var pointCount = polygonPoints.length;
-    p1 = polygonPoints[0];
- 
-    for (i = 1; i <= pointCount; i++) {
-        p2 = polygonPoints[i % pointCount];
-        if (
-            checkPoint[0] > Math.min(p1[0], p2[0]) &&
-            checkPoint[0] <= Math.max(p1[0], p2[0])
-        ) {
-            if (checkPoint[1] <= Math.max(p1[1], p2[1])) {
-                if (p1[0] != p2[0]) {
-                    xinters =
-                        (checkPoint[0] - p1[0]) *
-                            (p2[1] - p1[1]) /
-                            (p2[0] - p1[0]) +
-                        p1[1];
-                    if (p1[1] == p2[1] || checkPoint[1] <= xinters) {
-                        counter++;
-                    }
-                }
-            }
-        }
-        p1 = p2;
-    }
-      if (counter % 2 == 0) {
-          return false;
-      } else {
-          return true;
-      }
-  }
+  
   drawMapMark(num) {
-    let [x,y] = this.coordinate[num].pos["coordinates"]
-    let [m,n] = this.latLng2Pixel(x,y)
-    m = m/29844
-    n = n/11777
-    let temp1 = 70/this.state.canvasHeight 
-    let temp2 = 35/this.state.canvasWidth
-    var currentCanvasLeft = -(m-temp2) * this.state.canvasWidth + 0.5*this.state.width;
-    var mapMarkx = this.state.canvasWidth *  (m- temp2)
-    var mapMarky = this.state.canvasHeight * (n - temp1)
-    this.context.drawImage(mapMark, mapMarkx, mapMarky,70,70);
-    this.context.draw();
-    this.setState({
-    ...this.state,
-    canvasLeft:currentCanvasLeft,
-    currentLocation:this.coordinate[num].id,
-    })
-  }
-
-  componentDidShow() {
-    var that = this;
-    var beaconsTempArray : any[] = [];
-    var info = {//基站的uuid
-      uuids: ["fda50693-a4e2-4fb1-afcf-c6eb07647826"]
-    };
+    var i = 1;
+    var that = this
+    for (i = 0; i < this.coordinate.length; i++) {
+      if (num == this.coordinate[i].id) {
+        console.log(i)
+        console.log(this.state.currentLocation)
+        if(this.state.currentLocation != i)
+        {
+          this.setState({
+            currentLocation:i
+          })
+      }
+        break;
+      }
+    }
+    let [x, y] = this.coordinate[i].pos["coordinates"]
+    let [m, n] = this.latLng2Pixel(x, y)
+    m = m / 29844  
+    n = n / 11777
+    let temp1 = 25 / this.mapHeight
+    let temp2 = 25 / this.mapWidth
+    setTimeout(function () {
+      var mapMarkx = 0;
+      var mapMarky = 0;
+      if(that.update) {
+        that.update = 0;
+        that.mapWidth = that.baseWidth * 2;
+        that.mapHeight = that.baseHeight * 2;
+        that.mapY = -(n - temp1) * that.mapHeight + 0.5 * (that.state.canvasHeight - 375);
+        that.mapX = -(m - temp2) * that.mapWidth + 0.5 * that.state.width;
+        mapMarkx = that.mapX + (m - temp2) * that.mapWidth
+        mapMarky = that.mapY + that.mapHeight *  (n - temp1)
+        that.context.drawImage(map,that.mapX,that.mapY,that.mapWidth,that.mapHeight)
+      }
+      else {
+        mapMarkx = that.mapX + (m - temp2) * that.mapWidth
+        mapMarky = that.mapY + that.mapHeight *  (n - temp1)
+        that.context.drawImage(map,that.mapX,that.mapY,that.mapWidth,that.mapHeight)
+      }
+      
+      that.context.drawImage(mapMark, mapMarkx, mapMarky, 50, 50);
+      that.context.draw();
+    }, 50)
     
-    //监测蓝牙状态的改变
-    // Taro.onBluetoothAdapterStateChange(function (res) {
-    //   if (res.available) {//如果用户打开蓝牙，开始搜索IBeacon
-    //     searchBeacon();
-    //   }
+  }
+  // map=""
+  animation:any =null ;
+  load:any = 0;
+  componentDidShow() {
+    this.animation = Taro.createAnimation({
+             transformOrigin: "50% 50%",
+             duration: 1000,
+             timingFunction: "ease",
+             delay: 0
+           })
+    let imageInfo = {
+      url:'https://7465-test-70b991-1258348028.tcb.qcloud.la/newmap.jpg?sign=84bb93649d5627dcd3b25b66fb6e599a&t=1551333447'
+    }
+    
+    // Taro.downloadFile(imageInfo).then(res => {
+    //   this.map = res.tempFilePath
+    //   console.log(this.map,res)
     // })
+    
+    var that = this
+    setTimeout(function () {
+      that.context.drawImage(map, this.mapX, this.mapY, this.mapWidth, this.mapHeight)
+      that.context.draw()
+    }, 500)
+    
+    var starts=new Date().getTime();
+    while(true) if(new Date().getTime()-starts>2000) break;
+    console.log(true);
+    // beacon搜索函数
+    var beacon = {
+      m: 2.5,//m秒采集一次数据，更新周期
+      n: 5,//滑动窗口大小
+      p: 0,//数组指针
+      timer: -1,
+      max: { id: "", rssi: -128 },
+      k: 3,//5-10
+      array: [[]],
+    };
+    var beaconsArray: any[] = [];
+    beaconsArray = new Array(beacon.n);
+    for (var i = 0; i < beaconsArray.length; ++i)
+      beaconsArray[i] = new Array();
 
-    var flag = 1;
-    Taro.startBeaconDiscovery(info).then(() => {//开始搜索附近的iBeacon设备
-      Taro.onBeaconUpdate(function (res) {//监听 iBeacon 设备的更新事件  
-        //封装请求数据 
-        var beacons = res.beacons;
-        for (var i = 0; i < beacons.length; i++) {
-          if(beacons[i].accuracy != -1)
-          {//基站更新函数，将一段时间内的ibeacon强度求平均值，
-            flag = 1;
-            let mac = that.scenicArea[`${beacons[i].major + ":" + beacons[i].minor}`];
-            beaconsTempArray.forEach(item=> {
-              if(item.mac == mac) {
-                item.num ++;
-                item.rssi += beacons[i].rssi;
-                flag = 0;
-              }
-            })
-            if(flag) {
-              let bleObj = {
-                rssi:0,
-                mac:"",
-                num:1
-              };
-              bleObj.rssi = beacons[i].rssi;
-              bleObj.mac = that.scenicArea[`${beacons[i].major + ":" + beacons[i].minor}`];
-             // console.log(bleObj.mac);
-              beaconsTempArray.push(bleObj);
+    var that = this;
+    var devices: any[] = [];
+
+    Taro.startBeaconDiscovery(this.uuidArray).then(() => {
+      Taro.onBeaconUpdate(function (res) {
+        if (res && res.beacons && res.beacons.length > 0) {
+          devices = res.beacons;
+          for (var i = 0; i < devices.length; ++i) {
+            if (devices[i].major == 65535 && devices[i].accuracy != -1) {
+              var t = String(devices[i].minor) + " ";
+              if (!(t in beaconsArray[beacon.p]))
+                beaconsArray[beacon.p][t] = { num: 0, sum: 0 }
+              beaconsArray[beacon.p][t].num++;
+              beaconsArray[beacon.p][t].sum += devices[i].rssi;
+
             }
           }
         }
       });
-    })
-    setInterval(function() {//执行更新函数
-      beaconsTempArray.forEach(item=> {
-        item.rssi = item.rssi / item.num;
-      })
-      beaconsTempArray.sort(that.compare("rssi"));//对信号强度进行排序
-      if(beaconsTempArray.length && beaconsTempArray[0].rssi > that.state.criticalRssi && that.state.currentLocation != that.coordinate[beaconsTempArray[0].mac].id)
-      {
-        console.log(beaconsTempArray[0].mac)
-        that.drawMapMark(beaconsTempArray[0].mac)
+    });
+    this.timer = setInterval(function () {
+      var all: any[] = [];
+      for (var i = 0; i < beacon.n; ++i) {//合并
+        for (var x in beaconsArray[i]) {
+          if (!(x in all))
+            all[x] = { num: 0, sum: 0 }
+          all[x].num += beaconsArray[i][x].num;
+          all[x].sum += beaconsArray[i][x].sum;
+        }
       }
-      if(!beaconsTempArray.length || beaconsTempArray[0].rssi < that.state.criticalRssi) {//处理ibeacon信号弱或者收不到ibeacon信号时情况
-        // Taro.getLocation().then( d => {
-        //   console.log(11,d)
-        //   for(let i = 1; i < that.coordinate.length;i++) {
-        //     // if(that.isInPolygon([d["longitude"],d["latitude"]], that.coordinate[i].area["coordinates"])) {
-        //     //   that.drawMapMark(i)
-        //     //   break;
-        //     // }
-        //   }
-        // })
+      var max = { id: "", rssi: -128 };
+      beacon.max.rssi = -128;
+      for (var x in all) {
+        all[x].sum /= all[x].num;
+        if (all[x].sum > max.rssi) {//找当前最大
+          max.rssi = all[x].sum;
+          max.id = x;
+        }
+        if (Number(x) >> 8 == Number(beacon.max.id) >> 8)//找之前最大的rssi
+          beacon.max.rssi = beacon.max.rssi > all[x].sum ? beacon.max.rssi : all[x].sum;
+      }
+      var allstr: any[] = [];
+
+      for (var x in all)
+        allstr.push(((Number(x) >> 8) + 1) + "-" + ((Number(x) & 0xFF) + 1) + ":" + all[x].num + " " + all[x].sum.toFixed(2));
+      var isupdate = false;
+      if (max.id) {
+        if (!beacon.max.id)
+          isupdate = true;
+        else if (beacon.max.id in all) {
+          if (max.rssi - beacon.max.rssi > beacon.k)
+            isupdate = true;
+        }
+        else isupdate = true;
+      }
+      if (isupdate) {
+        beacon.max.id = max.id;
+        that.scale = 2
+        that.update = 1
+        that.drawMapMark((Number(max.id) >> 8) + 1);
+      }
+      if (!Object.keys(all).length) {
+        Taro.getLocation().then(d => {
+          let i;
+          for (i = 0; i < that.coordinate.length; i++) {
+            if (isInPolygon([d["longitude"], d["latitude"]], that.coordinate[i].area["coordinates"][0])) {
+              if (i == that.state.currentLocation) break;
+              that.scale = 2
+              that.update = 1
+              that.drawMapMark(that.coordinate[i].id);
+              break;
+            }
+          }
+          if (i == that.coordinate.length) {
+            that.setState({
+              currentLocation: -1
+            })
+          }
+        })
+      }
+      beacon.p = (beacon.p + 1) % beacon.n;
+      beaconsArray[beacon.p] = [];
+
+    }, beacon.m * 1000);
+    
+  }
+
+
+  
+  componentDidHide() {
+    Taro.stopBeaconDiscovery(this.uuidArray)
+    clearInterval(this.timer)
+   }
+  move = (e) => {//手指移动回调函数
+    console.log(this.state.currentLocation)
+  if (e.changedTouches.length == 1) {
+    let currentx = e.changedTouches[0]["x"]
+    let currenty = e.changedTouches[0]["y"]
+    let deltax = currentx - this.beginTouchX
+    let deltay = currenty - this.beginTouchY
+    this.mapX = this.mapX + deltax
+    this.mapY = this.mapY + deltay * 0.1
+    if (this.mapX > 0) this.mapX = 0
+    if (this.mapX < -this.mapWidth + this.state.width) this.mapX = -this.mapWidth + this.state.width
+    if (this.mapY > 0) this.mapY = 0
+    if (this.mapY < -this.mapHeight ) this.mapY = -this.mapHeight + this.baseHeight
+    this.beginTouchX = currentx
+  } 
+  else {
+    console.log(123);
+    let xMove = e.changedTouches[1]["x"] - e.changedTouches[0]["x"]
+    let yMove = e.changedTouches[1]["y"] - e.changedTouches[0]["y"];
+    // 新的 ditance
+    let distance = Math.sqrt(xMove * xMove + yMove * yMove);
+    let distanceDiff = distance - this.distance;
+    
+    let newScale = this.scale + 0.006 * distanceDiff
+    if(newScale >= 3) {
+        newScale = 3
+    }
+    if(newScale <= 1) {
+        newScale = 1
+    }
+    let xMiddle = (e.changedTouches[1]["x"] + e.changedTouches[0]["x"]) / 2
+    let yMiddle = (e.changedTouches[1]["y"] + e.changedTouches[0]["y"]) / 2
+    let xPercent = (-this.mapX + xMiddle) / this.mapWidth
+    let yPercent = (-this.mapY + yMiddle) / this.mapHeight
+    this.mapWidth = newScale * this.baseWidth
+    this.mapHeight = newScale * this.baseHeight
+    this.mapX = - xPercent * this.mapWidth  + xMiddle
+    this.mapY = - yPercent * this.mapHeight + yMiddle
+    this.distance = distance
+    this.scale = newScale
+  }
+  if(this.state.currentLocation != -1) {
+    this.drawMapMark(this.coordinate[this.state.currentLocation].id)
+  }
+  this.context.drawImage(map, this.mapX, this.mapY, this.mapWidth, this.mapHeight)
+  
+  if(this.state.currentLocation == -1) {
+    this.context.draw()
+  }
+  
+}
+start = (e) => {//开始触摸时执行的函数，将触摸起始位置保存
+  if(e.touches.length == 1) {
+    this.beginTouchX = e.changedTouches[0]["x"]
+    this.beginTouchY = e.changedTouches[0]["y"]
+  } else {
+      let xMove = e.touches[1]["x"] - e.touches[0]["x"];
+      let yMove = e.touches[1]["y"] - e.touches[0]["y"];
+      this.distance = Math.sqrt(xMove * xMove + yMove * yMove);
+  }
+}
+seeDetails() {
+  Taro.stopBeaconDiscovery(this.uuidArray)
+  clearInterval(this.timer)
+  Taro.navigateTo({
+    url: `../index/index?id=${this.coordinate[this.state.currentLocation].id}`
+  });
+}
+close() {
+  this.setState({
+    tip:false,
+  })
+}
+translateUp() {
+  var temp = - this.state.canvasHeight * 0.55;
+  console.log(temp)
+  console.log(this.state.canvasHeight)
+  this.animation.translate(0, temp).step()
+  this.animation= this.animation.export();
+  setTimeout(() => {
+    this.animation = Taro.createAnimation({
+      transformOrigin: "50% 50%",
+      duration: 1000,
+      timingFunction: "ease",
+      delay: 0
+    })
+  }, 500);
+  this.setState ({
+    up:false
+  })
+}
+translateDown() {
+  var temp =this.state.canvasHeight * 0.55;
+  this.animation.translate(0, temp).step()
+  this.animation= this.animation.export();
+  setTimeout(() => {
+    this.animation = Taro.createAnimation({
+      transformOrigin: "50% 50%",
+      duration: 1000,
+      timingFunction: "ease",
+      delay: 0
+    })
+  }, 500);
+  this.setState ({
+    up:true
+  })
+}
+render() {
+  return (
+    <View className='page' >
+      <HomePageTar></HomePageTar>
+      <Canvas
+        className={this.state.isIPX ? 'canvasIPX' : 'canvas' }
+        canvasId='canvas'
+        onTouchStart={this.start}
+        onTouchMove={this.move}
+      >
+      </Canvas>
+      <CoverImage src={shadowUp} className={this.state.isIPX ? 'shadowUpIPX' : 'shadowUp'}/>
+      <CoverImage src={shadowDown} className='shadowDown'/>
+      
+      {this.state.currentLocation != -1 
+      ?<CoverView className = 'detail' animation={this.animation}>
+          <CoverImage className='detailImage' src={'https://www.shenquangu.net:25888' + this.coordinate[this.state.currentLocation]["pic"][0].pic}></CoverImage>
+          <CoverView className='detailTitle'>{this.coordinate[this.state.currentLocation].name}</CoverView>
+          <CoverView className='detailIntroduction'>{this.coordinate[this.state.currentLocation].description}</CoverView>
+          <CoverView onClick={this.seeDetails} className='seeDetail'>查看详情>></CoverView>
+        </CoverView>
+      :<CoverView className = 'detail' animation={this.animation}>
+        <CoverImage className='detailImageFalse' src={shenquangu}></CoverImage>
+        <CoverView onClick={this.seeDetails} className='seeDetailFalse'>您当前不在景点范围内</CoverView>
+        </CoverView>
+      }
+     
+      {
+        this.state.up &&
+            <CoverImage src={down1} onClick={this.translateUp} className='up'></CoverImage>
+          
+      }
+      {this.state.up == false &&
+      <CoverImage onClick={this.translateDown} src={down} className='down'></CoverImage>
+      
       }
       
-      beaconsTempArray = [];
-    },this.state.interval*1000)
-    function stopSearchBeacom() {
-      Taro.stopBeaconDiscovery({
-        success: function () {
-          // searchBeacon();
-        }
-      })
-    }
-    this.context.setFillStyle('rgba(255, 255, 255, 0)')
-    this.context.fill()
-  }
-  componentDidHide() { }
-  touchMoveCallBack(e) {//手指移动回调函数
-    let x = e.changedTouches[0]["x"]
-    let currentTouchX = this.state.touch["startLocationX"];
-    let currentX = this.state.canvasLeft;
-    let moveX = currentX + (x - currentTouchX)/10;
-    if(moveX > 0) moveX = 0;
-    if(this.state.inChaoJing && moveX < -(this.state.canvasWidth - this.state.width)) moveX = -(this.state.canvasWidth - this.state.width)
-    if(!this.state.inChaoJing && moveX < -(this.state.chaoJingWidth - this.state.width)) moveX = -(this.state.chaoJingWidth - this.state.width)
-    this.setState({
-      ...this.state,
-      canvasLeft:moveX,
-    })
-  }
-  touchstartCallback(e) {//开始触摸时执行的函数，将触摸起始位置保存
-    this.setState({
-      ...this.state,
-      touch:{
-        ...this.state.touch,
-        startLocationX:e.changedTouches[0]["x"],
-        startLocationY:e.changedTouches[0]["y"]
+      {this.state.tip && 
+        <CoverView className={this.state.isIPX ? 'tipIPX' : 'tip'}>
+          <CoverView className = 'tipContent'>提示：请打开蓝牙和GPS</CoverView>
+        </CoverView>
       }
-    })
-  }
-  seeDetails() {
-    Taro.navigateTo({
-      url: `../index/index?id=${this.state.currentLocation}`
-    });
-  }
-  render() {
-    return (
-      <View className='page' >
-        <Canvas  
-          className='canvas' 
-          style="height:{{canvasHeight}}px;width:{{canvasWidth}}px;left:{{canvasLeft}}px;position:fixed;" 
-          canvasId='canvas'
-          onTouchStart={this.touchstartCallback}
-          onTouchMove={this.touchMoveCallBack}
-          >
-           <Image  src="cloud://test-70b991.7465-test-70b991/newmap.jpg" style= "height:{{canvasHeight}}px;width:{{canvasWidth}}px;"></Image>
-        </Canvas> 
+      {this.state.tip && 
+        <CoverImage onClick={this.close} className={this.state.isIPX ? 'tipImageIPX' : 'tipImageIPX'} src={cancel}></CoverImage>
+      }
+
+     
+
+      
+
+      {/* {(this.state.currentLocation != -1) &&
         <View className='introduction'>
           <View className='box1'></View>
           <View className="info">
             <View className='scenicName'>
               <View>
-                {this.coordinate[this.state.currentLocation].name}
+                
               </View>
             </View>
-            <View className="details" onClick={this.seeDetails}>查看详情 >></View>
+            <View className="details" >查看详情 >></View>
           </View>
         </View>
-      </View>
-
-    )
-  }
+      } */}
+    </View>
+  )
+}
 }
 

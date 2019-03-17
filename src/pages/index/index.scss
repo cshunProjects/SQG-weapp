@@ -1,46 +1,152 @@
-.page {
-    display:flex;
-    flex-flow:column nowrap;
-    background-color:rgb(220,220,220);
-    width:100%; 
-    height:100%;    
-     .swiper {
-        position:fixed !important;
-        width:100%;
-     }
-    .box1 {
-        display:flex !important;
-          
-        width:100%;
-    }   
-    .introductionContainer{
-        background-color:rgb(220,220,220);
-        display:flex;
-        flex-flow: column wrap;
-        align-items: center;
-        .introduction { 
-            padding-top:20px;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            background-color: white;
-            width:90%;
-            display:flex;
-            flex-flow: column nowrap;
-            .title { 
-                font-size:70px;
-                padding-left:40px;
-                padding-bottom: 15px;
-            }
-            .wordContentContainer {
-                display:flex;
-                justify-content: center;
-                  
-                .wordContent {
-                    padding-top:15px;
-                    width:90%;
-                }
-            }
-           
-        }
+
+
+.top {
+    z-index:100000;
+    position: fixed;
+    width:100%;
+    height:380px;
+    color:white;
+    background: linear-gradient(to bottom right, rgb(87,143,247), rgb(128,214,251)); 
+    .topBack {
+        width:50px;
+        height:50px;
+        margin-top:70px;
+        margin-left:30px;
+    }
+    .topTitle {
+        margin-top: -70px;
+        margin-left:300px;
+    }
+    .swiper {
+        background-color: white;
+        z-index:10000;
+        margin-top:50px;
+        position:fixed;
+        width:525px;
+        height:540px;
+        border-radius: 20px;
+        margin-left:115px;
+    }
+    .swiperItem {
+        border-radius: 30px;
+        width:525px;
+        height:540px;
     }
 }
+
+.topIPX {
+    position: fixed;
+    width:100%;
+    height:380px;
+    color:white;
+    background: linear-gradient(to bottom right, rgb(87,143,247), rgb(128,214,251)); 
+    .topBackIPX {
+        width:50px;
+        height:50px;
+        margin-top:100px;
+        margin-left:30px;
+    }
+    .topTitleIPX {
+        margin-top: -62px;
+        margin-left:300px;
+    }
+    .swiperIPX {
+        margin-top:70px;
+        position:fixed;
+        width:525px;
+        height:540px;
+        border-radius: 20px;
+        margin-left:115px;
+    }
+    .swiperItem {
+        border-radius: 30px;
+        width:525px;
+        height:540px;
+    }
+}
+.intr {
+    display: flex;
+    flex-flow:column nowrap;
+    top:500px;
+}
+.box{
+    height:850px;
+}
+.boxIPX {
+    height:880px;
+}
+.intrContentFather {
+    display:flex;
+    height:750px;
+    overflow: scroll
+}
+.intrContent {
+    position:fixed;
+    width:590px;
+    top:850px;
+    font-size: 35px;
+    // font-size:70px;
+    overflow: scroll;
+    height:484px;
+    left:80px;
+}
+
+.intrContentIPX {
+    position:fixed;
+    width:590px;
+    top:870px;
+    font-size: 35px;
+    // font-size:70px;
+    overflow: scroll;
+    height:740px;
+    left:80px;
+}
+.intrNameIPX {
+    position:fixed;
+    margin-top:790px;
+    font-size:50px;
+    margin-left:115px;
+    font-weight: bold;
+}
+.intrName {
+    font-family: 'UKIJTuz';
+    background-color: white;
+    z-index:10000;
+    position:fixed;
+    margin-top:760px;
+    font-size:50px;
+    margin-left:115px;
+    font-weight: bold;
+    
+    
+}
+.intrAudio {
+    background-color: white;
+    z-index:10000;
+    position:fixed;
+    margin-top:765px;
+    font-size:50px;
+    margin-left:350px;
+    height:50px;
+    width:50px;
+    font-weight: bold;
+}
+
+.intrAudioIPX {
+    background-color: white;
+    z-index:10000;
+    position:fixed;
+    margin-top:805px;
+    font-size:50px;
+    margin-left:350px;
+    height:50px;
+    width:50px;
+    font-weight: bold;
+}
+
+@font-face{
+    font-family: 'UKIJTuz';
+    src:url('https://7465-test-70b991-1258348028.tcb.qcloud.la/ziti.ttf?sign=def0e3f618ef99cf1e54d717d25115d9&t=1552577413')format('truetype');
+    font-style: normal;
+    font-weight: normal;
+ }

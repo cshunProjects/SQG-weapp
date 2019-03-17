@@ -19,25 +19,31 @@ class App extends Component {
    */
   config: Config = {
     pages: [
-      'pages/index/index',
       'pages/test/index',
+      'pages/index/index',
+     
+      
+      
+ 
+      
       
       
       
     ],
-    
+    permission: {
+      "scope.userLocation": {
+        "desc": "你的位置信息将用于小程序位置接口的效果展示"
+      }
+    },
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'black',
+      navigationStyle:'custom',
       
     },
-    permission: {
-      "scope.userLocation": {
-        "desc": "你的位置信息将用于小程序位置接口的效果展示"
-      }
-    }
+    
   }
 
   componentDidMount () {

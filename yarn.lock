@@ -97,10 +97,10 @@
     omit.js "^1.0.0"
     weui "^1.1.2"
 
-"@tarojs/plugin-babel@^1.2.0-beta.7":
-  version "1.2.1"
-  resolved "http://registry.npm.taobao.org/@tarojs/plugin-babel/download/@tarojs/plugin-babel-1.2.1.tgz#9f85add3b32413347dcc9f65a9d93a3470df6ca5"
-  integrity sha1-n4Wt07MkEzR9zJ9lqdk6NHDfbKU=
+"@tarojs/plugin-babel@^1.2.15":
+  version "1.2.15"
+  resolved "https://registry.yarnpkg.com/@tarojs/plugin-babel/-/plugin-babel-1.2.15.tgz#cf66b5cf7fd99dee4ec3e7e586366614e31bd021"
+  integrity sha512-b2RBlL9GNadzK2gv9n8f3oq/FR6UJkYGSikBluqEU9K6ilhQp6gz9FS7NZaJ3qQjEqEt9J7OjALk11t2ObCnQQ==
   dependencies:
     babel-core "^6.26.0"
 

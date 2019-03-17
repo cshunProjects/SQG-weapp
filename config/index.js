@@ -31,6 +31,7 @@ const config = {
     }
   },
   weapp: {
+    staticDirectory: 'static',
     module: {
       postcss: {
         autoprefixer: {

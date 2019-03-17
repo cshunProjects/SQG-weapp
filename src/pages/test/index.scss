@@ -3,51 +3,143 @@
    display: flex;
    flex-flow:column nowrap;
 }
-// .scroll {
 
-//     width:500px;
-//     height:500px;
-
-// }
-
- .ime {
-     display:none;
-    height:10px;
-    width:10px;
- }
-
-.introduction {
-   z-index:100;
+.canvas {
+   top:120px;
+   position:fixed;
+   width:100%;
    height:100%;
+}
+
+.canvasIPX {
+   top:175px;
+   position:fixed;
+   width:100%;
+   height:100%;
+}
+.shadowDown {
+
    position:fixed;
    bottom:0;
-   display:flex;
-   flex-flow: column nowrap;
+   height:300px;
+}
 
-   .box1 {
-      height:85%;
+.shadowUpIPX {
+   position:fixed;
+   top:175px;
+   opacity: 0.3;
+   height:120px;
+}
+
+.shadowUp {
+   opacity: 0.5;
+   position:fixed;
+   top:0px;
+   height:180px;
+}
+
+.detail {
+   background-color: white;
+   position:fixed;
+   left:115px;
+   border-radius: 40px;
+   border:5px solid rgb(94,159,243);
+   border-width:5px;
+   bottom:-550px;
+   width:525px;
+   height:545px;
+   .detailImage {
+      width:525px;
+      height:265px;
    }
-   .info {
-      border-top-left-radius: 35px;
-      border-top-right-radius: 35px;
-      height:15%;
-      background-color: rgb(236,236,236);
-      position:fixed;
-      width:100%;
-      bottom:0;
-      .scenicName {
-         padding-top:10px;
-         font-size: 50px;
-         justify-content: center;
-         display: flex;
-      }
-      .details {
-         font-size:35px;
-         position:fixed;
-         bottom:30px;
-         right:20px;
-      }
+   .detailTitle {
+      margin-top:35px;
+      font-size: 50px;
+      font-weight: bold;
+      margin-left:50px;
    }
-   
+   .detailIntroduction {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-top:32px;
+      color:rgb(169,169,169);
+      font-size: 30px;
+      margin-left:50px;
+   }
+   .seeDetail {
+      margin-top:45px;
+      font-size:32px;
+      margin-left:330px;
+   }
  }
+
+ .tipIPX {
+    font-size:40px;
+    position:fixed;
+    margin-top:175px;
+ }
+
+ .tipImageIPX {
+    position:fixed;
+    margin-top:175px;
+    height:50px;
+    width:50px;
+    left:650px;
+ }
+
+
+ .tip {
+    width:100%;
+    font-size:30px;
+    height:50px;
+    background-color: rgb(152,203,223);
+   position:fixed;
+   margin-top:120px;
+   font-family: UKIJTuz;
+}
+
+.tipContent {
+   margin-top:10px;
+}
+.tipImageIPX {
+   position:fixed;
+   margin-top:120px;
+   height:40px;
+   width:40px;
+   left:650px;
+}
+
+.up {
+   width:100px;
+   height:100px;
+   position:fixed;
+   top:1200px;
+   left:330px;
+
+}
+
+.down {
+   width:100px;
+   height:100px;
+   position:fixed;
+   margin-top:1200px;
+   margin-left: 330px;
+}
+.detailImageFalse {
+   height:450px;
+}
+.seeDetailFalse {
+   font-size:32px;
+   margin-left:100px;
+}
+
+.touches {
+   position:fixed;
+   height:100%;
+   width:100%;
+   
+  // background-color: white;
+   
+}
 
